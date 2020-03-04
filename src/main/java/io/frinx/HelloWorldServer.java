@@ -1,8 +1,9 @@
 package io.frinx;
 
-import io.frinx.examples.helloworld.GreeterGrpc;
-import io.frinx.examples.helloworld.HelloReply;
-import io.frinx.examples.helloworld.HelloRequest;
+import com.google.protobuf.Empty;
+import io.frinx.examples.helloworld.DataRequest;
+import io.frinx.examples.helloworld.DataReceiverGrpc;
+import io.frinx.examples.helloworld.DataRequest;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -21,7 +22,7 @@ public class HelloWorldServer {
         /* The port on which the server should run */
         int port = 50051;
         server = ServerBuilder.forPort(port)
-            .addService(new GreeterImpl())
+            .addService(new DataReceiverImpl())
             .build()
             .start();
         logger.info("Server started, listening on " + port);
@@ -60,12 +61,12 @@ public class HelloWorldServer {
         server.blockUntilShutdown();
     }
 
-    static class GreeterImpl extends GreeterGrpc.GreeterImplBase {
+    static class DataReceiverImpl extends DataReceiverGrpc.DataReceiverImplBase {
 
         @Override
-        public void sayHello(HelloRequest req, StreamObserver<HelloReply> responseObserver) {
-            HelloReply reply = HelloReply.newBuilder().setMessage("Hello " + req.getName()).build();
-            responseObserver.onNext(reply);
+        public void sendData(DataRequest req, StreamObserver<Empty> responseObserver) {
+            responseObserver.onNext(Empty.getDefaultInstance());
+            System.out.println("dostal som spravu " + req.getDeviceData() + " " + req.getDeviceName());
             responseObserver.onCompleted();
         }
     }
