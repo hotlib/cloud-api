@@ -13,13 +13,13 @@
 // limitations under the License.
 syntax = "proto3";
 
+package devmand.channels.cli.plugin;
+
 import "google/protobuf/empty.proto";
 option java_multiple_files = true;
 option java_package = "io.frinx.datareceiver";
 option java_outer_classname = "DataReceiverProto";
 option objc_class_prefix = "DRP";
-
-package helloworld;
 
 service DataReceiver {
   rpc sendData (DataRequest) returns (google.protobuf.Empty) {}
