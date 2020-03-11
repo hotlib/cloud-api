@@ -2,24 +2,31 @@ package io.frinx;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.frinx.db.tables.Devicedata;
-import io.frinx.db.tables.records.DevicedataRecord;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import org.jooq.DSLContext;
-import org.jooq.JSONB;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
+import java.io.InputStream;
+import java.util.Properties;
 
-/**
- * Hello world!
- *
- */
-public class App 
+public class App
 {
     public static void main( String[] args ) throws IOException, InterruptedException {
-        HikariConfig config = new HikariConfig("/home/palo/work/projects/cloud-api/src/main/resources/hikari.properties");
+
+        Properties properties = new Properties();
+        InputStream stream = null;
+        try {
+            stream = App.class.getClassLoader().getResourceAsStream("hikari.properties");
+            properties.load(stream);
+        } finally {
+            if(stream != null){
+                stream.close();
+            }
+        }
+
+        if(properties.isEmpty()){
+            System.err.println("property file not found");
+            return;
+        }
+
+        HikariConfig config = new HikariConfig(properties);
         HikariDataSource ds = new HikariDataSource(config);
         DataReceiverServer.startDataReceiver(ds);
 
