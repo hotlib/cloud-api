@@ -1,27 +1,29 @@
 package io.frinx;
 
 import com.google.protobuf.Empty;
+import com.zaxxer.hikari.HikariDataSource;
 import io.frinx.datareceiver.DataRequest;
 import io.frinx.datareceiver.DataReceiverGrpc;
+import io.frinx.db.tables.records.DevicedataRecord;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.jooq.DSLContext;
+import org.jooq.JSONB;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 
-/**
- * Server that manages startup/shutdown of a {@code Greeter} server.
- */
 public class DataReceiverServer {
     private static final Logger logger = Logger.getLogger(DataReceiverServer.class.getName());
-
     private Server server;
 
-    private void start() throws IOException {
+    private void start(HikariDataSource ds) throws IOException {
         /* The port on which the server should run */
         int port = 50051;
         server = ServerBuilder.forPort(port)
-            .addService(new DataReceiverImpl())
+            .addService(new DataReceiverImpl(ds))
             .build()
             .start();
         logger.info("Server started, listening on " + port);
@@ -51,21 +53,31 @@ public class DataReceiverServer {
         }
     }
 
-    /**
-     * Main launches the server from the command line.
-     */
-    public static void main(String[] args) throws IOException, InterruptedException {
-        final DataReceiverServer server = new DataReceiverServer();
-        server.start();
-        server.blockUntilShutdown();
-    }
+   public static void startDataReceiver(HikariDataSource ds) throws IOException, InterruptedException {
+       final DataReceiverServer server = new DataReceiverServer();
+       server.start(ds);
+       server.blockUntilShutdown();
+   }
 
     static class DataReceiverImpl extends DataReceiverGrpc.DataReceiverImplBase {
+        private final HikariDataSource hikariDataSource;
+
+        public DataReceiverImpl(HikariDataSource ds) {
+            this.hikariDataSource = ds;
+        }
 
         @Override
         public void sendData(DataRequest req, StreamObserver<Empty> responseObserver) {
             responseObserver.onNext(Empty.getDefaultInstance());
-            System.out.println("dostal som spravu " + req.getDeviceData() + " " + req.getDeviceName());
+            try  {
+                DSLContext context = DSL.using(hikariDataSource.getConnection(), SQLDialect.POSTGRES);
+                DevicedataRecord record = new DevicedataRecord();
+                record.setDevicename(JSONB.valueOf(req.getDeviceName()));
+                record.setDevicedata(JSONB.valueOf(req.getDeviceData()));
+                context.executeInsert(record);
+            } catch (Exception e) {
+                logger.warning("Unable to insert data to postgres" + e.getMessage());
+            }
             responseObserver.onCompleted();
         }
     }

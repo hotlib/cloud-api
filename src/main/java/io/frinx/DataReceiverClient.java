@@ -38,9 +38,8 @@ public class DataReceiverClient {
     }
 
     /** Say hello to server. */
-    public void greet(String name) {
-        logger.info("Will try to greet " + name + " ...");
-        DataRequest request = DataRequest.newBuilder().setDeviceData("nothing").setDeviceName("no name").build();
+    public void sendData() {
+        DataRequest request = DataRequest.newBuilder().setDeviceData("{\"bbb\":\"1112\"}").setDeviceName("{\"bbb\":\"11112\"}").build();
         try {
             blockingStub.sendData(request);
         } catch (StatusRuntimeException e) {
@@ -57,12 +56,7 @@ public class DataReceiverClient {
         // Access a service running on the local machine on port 50051
         DataReceiverClient client = new DataReceiverClient("localhost", 50051);
         try {
-            String user = "world";
-            // Use the arg as the name to greet if provided
-            if (args.length > 0) {
-                user = args[0];
-            }
-            client.greet(user);
+            client.sendData();
         } finally {
             client.shutdown();
         }
