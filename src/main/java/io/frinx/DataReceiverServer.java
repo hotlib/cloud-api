@@ -24,6 +24,7 @@ public class DataReceiverServer {
         int port = 50051;
         server = ServerBuilder.forPort(port)
             .addService(new DataReceiverImpl(ds))
+            .intercept(new AuthorizationInterceptor(ds))
             .build()
             .start();
         logger.info("Server started, listening on " + port);

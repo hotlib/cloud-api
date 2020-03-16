@@ -4,3 +4,11 @@ CREATE TABLE devmandpoc.devicedata
     devicename jsonb,
     devicedata jsonb
 );
+
+CREATE TABLE devmandpoc.organizations
+(
+    organization_id serial PRIMARY KEY,
+    api_key VARCHAR(512)
+);
+
+INSERT INTO devmandpoc.organizations (api_key) VALUES ('testingapikey');

@@ -24,6 +24,7 @@ public class DataReceiverClient {
             // Channels are secure by default (via SSL/TLS). For the example we disable TLS to avoid
             // needing certificates.
             .usePlaintext()
+            .intercept(new AppendApiKeyInterceptor())
             .build());
     }
 
@@ -48,10 +49,6 @@ public class DataReceiverClient {
         }
     }
 
-    /**
-     * Greet server. If provided, the first element of {@code args} is the name to use in the
-     * greeting.
-     */
     public static void main(String[] args) throws Exception {
         // Access a service running on the local machine on port 50051
         DataReceiverClient client = new DataReceiverClient("localhost", 50051);

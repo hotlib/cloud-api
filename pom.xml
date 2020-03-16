@@ -161,9 +161,6 @@
                             <name>org.jooq.meta.postgres.PostgresDatabase</name>
                             <includes>.*</includes>
                             <excludes></excludes>
-                            <!-- In case your database supports catalogs, e.g. SQL Server:
-                            <inputCatalog>public</inputCatalog>
-                              -->
                             <inputSchema>devmandpoc</inputSchema>
                         </database>
                         <target>
