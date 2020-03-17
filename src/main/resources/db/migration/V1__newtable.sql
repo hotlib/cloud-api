@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS devmandpoc;
+
 CREATE TABLE devmandpoc.devicedata
 (
     id         serial PRIMARY KEY,
