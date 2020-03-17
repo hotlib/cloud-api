@@ -40,7 +40,8 @@ public class AuthorizationInterceptor implements ServerInterceptor {
         throwException(Constants.authString, authStringValue);
       }
     } catch (SQLException e) {
-      //TODO ???
+      System.err.println("Unable to verify " + Constants.authString
+          + " error: " + e.getMessage());
     }
     return serverCallHandler.startCall(serverCall, metadata);
   }
