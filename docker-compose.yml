@@ -1,0 +1,11 @@
+version: '3'
+services:
+  cloudapi:
+    build: .
+    ports:
+      - "50051:50051"
+
+networks:
+  default:
+    external:
+      name: frinx-machine_default

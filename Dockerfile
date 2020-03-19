@@ -5,6 +5,7 @@ RUN yum update -y && yum install -y less zip unzip net-tools curl && rm -rf /var
 WORKDIR /opt
 ADD target/cloudapi-1.0-SNAPSHOT-jar-with-dependencies.jar /opt/
 ADD hikari.properties /opt/
+ADD logback.xml /opt/
 ADD run.sh /opt/
 EXPOSE 50051
 ENTRYPOINT ["/opt/run.sh"]
