@@ -6,8 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import org.flywaydb.core.Flyway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class App {
+
+  private static final Logger logger
+      = LoggerFactory.getLogger(App.class);
+  public static final String HIKARI_PROPERTIES = "hikari.properties";
 
   private static CommandlineParser parseCommandLineArgs(String[] args) {
     CommandlineParser parser = new CommandlineParser();
@@ -25,7 +31,7 @@ public class App {
     Properties properties = new Properties();
     InputStream stream = null;
     try {
-      stream = App.class.getClassLoader().getResourceAsStream("hikari.properties");
+      stream = App.class.getClassLoader().getResourceAsStream(HIKARI_PROPERTIES);
       properties.load(stream);
     } finally {
       if (stream != null) {
@@ -34,7 +40,7 @@ public class App {
     }
 
     if (properties.isEmpty()) {
-      System.err.println("property file not found");
+      logger.error(HIKARI_PROPERTIES + " not found, terminating");
       return;
     }
 
@@ -47,6 +53,5 @@ public class App {
     } else {
         DataReceiverServer.startDataReceiver(ds);
     }
-
   }
 }

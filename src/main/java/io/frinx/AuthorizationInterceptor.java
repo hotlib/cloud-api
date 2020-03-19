@@ -14,9 +14,11 @@ import java.sql.SQLException;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.slf4j.LoggerFactory;
 
 public class AuthorizationInterceptor implements ServerInterceptor {
-
+  private static final org.slf4j.Logger logger
+      = LoggerFactory.getLogger(AuthorizationInterceptor.class);
   private final HikariDataSource hikariDataSource;
 
   public AuthorizationInterceptor(HikariDataSource ds) {
@@ -28,6 +30,7 @@ public class AuthorizationInterceptor implements ServerInterceptor {
         authStringValue == null ? authString + " not present, cannot authenticate!"
             : "invalid " + authString + ": " + authStringValue;
     Status status = Status.PERMISSION_DENIED.augmentDescription(description);
+    logger.warn(description);
     throw new StatusRuntimeException(status);
   }
 
@@ -40,8 +43,10 @@ public class AuthorizationInterceptor implements ServerInterceptor {
         throwException(Constants.authString, authStringValue);
       }
     } catch (SQLException e) {
-      System.err.println("Unable to verify " + Constants.authString
-          + " error: " + e.getMessage());
+      String description = "Unable to verify " + Constants.authString
+          + " error: " + e.getMessage();
+      logger.error(description, e);
+
     }
     return serverCallHandler.startCall(serverCall, metadata);
   }

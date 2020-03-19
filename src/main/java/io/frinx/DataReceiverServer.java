@@ -14,20 +14,21 @@ import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
+import org.slf4j.LoggerFactory;
 
 public class DataReceiverServer {
-    private static final Logger logger = Logger.getLogger(DataReceiverServer.class.getName());
+
+    private static final org.slf4j.Logger logger
+        = LoggerFactory.getLogger(DataReceiverServer.class);
     private Server server;
 
     private void start(HikariDataSource ds) throws IOException {
-        /* The port on which the server should run */
-        int port = 50051;
-        server = ServerBuilder.forPort(port)
+        server = ServerBuilder.forPort(Constants.PORT)
             .addService(new DataReceiverImpl(ds))
             .intercept(new AuthorizationInterceptor(ds))
             .build()
             .start();
-        logger.info("Server started, listening on " + port);
+        logger.info("Server started, listening on " + Constants.PORT);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -74,7 +75,7 @@ public class DataReceiverServer {
                 record.setDevicedata(JSONB.valueOf(req.getDeviceData()));
                 context.executeInsert(record);
             } catch (Exception e) {
-                logger.warning("Unable to insert data to postgres" + e.getMessage());
+                logger.error("Unable to insert data to postgres", e.getMessage());
             }
             responseObserver.onCompleted();
         }
