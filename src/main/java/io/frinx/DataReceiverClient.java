@@ -32,7 +32,7 @@ public class DataReceiverClient {
     }
 
     public void sendData() {
-        DataRequest request = DataRequest.newBuilder().setDeviceData("{\"bssbb\":\"1112\"}").setDeviceName("{\"bbssb\":\"11112\"}").build();
+        DataRequest request = DataRequest.newBuilder().setDeviceData("{\"bsxxxsbb\":\"1112\"}").setDeviceName("{\"bbssb\":\"11112\"}").build();
         try {
             blockingStub.sendData(request);
         } catch (StatusRuntimeException e) {
@@ -42,7 +42,7 @@ public class DataReceiverClient {
     }
 
     public static void main(String[] args) throws Exception {
-        DataReceiverClient client = new DataReceiverClient("localhost", 50051);
+        DataReceiverClient client = new DataReceiverClient("localhost", Constants.PORT);
         try {
             client.sendData();
         } finally {

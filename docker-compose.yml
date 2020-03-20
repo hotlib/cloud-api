@@ -3,7 +3,7 @@ services:
   cloudapi:
     build: .
     ports:
-      - "50051:50051"
+      - "50052:50052"
 
 networks:
   default:

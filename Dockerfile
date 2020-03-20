@@ -7,5 +7,5 @@ ADD target/cloudapi-1.0-SNAPSHOT-jar-with-dependencies.jar /opt/
 ADD hikari.properties /opt/
 ADD logback.xml /opt/
 ADD run.sh /opt/
-EXPOSE 50051
+EXPOSE 50052
 ENTRYPOINT ["/opt/run.sh"]
