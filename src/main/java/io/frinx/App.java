@@ -46,12 +46,13 @@ public class App {
 
     HikariConfig config = new HikariConfig(properties);
     HikariDataSource ds = new HikariDataSource(config);
+    DbAccess dbAccess = new DbAccess(ds);
 
     if (parser.isCreateDatabase()) {
         Flyway flyway = Flyway.configure().dataSource(ds).load();
         flyway.migrate();
     } else {
-        DataReceiverServer.startDataReceiver(ds);
+        DataReceiverServer.startDataReceiver(dbAccess);
     }
   }
 }

@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory;
 public class AuthorizationInterceptor implements ServerInterceptor {
   private static final org.slf4j.Logger logger
       = LoggerFactory.getLogger(AuthorizationInterceptor.class);
-  private final HikariDataSource hikariDataSource;
+  private final DbAccess da;
 
-  public AuthorizationInterceptor(HikariDataSource ds) {
-    this.hikariDataSource = ds;
+  public AuthorizationInterceptor(DbAccess da) {
+    this.da = da;
   }
 
   private void throwException(String authString, String authStringValue) {
@@ -39,7 +39,7 @@ public class AuthorizationInterceptor implements ServerInterceptor {
 
     try {
       final String authStringValue = getApiKey(metadata);
-      if (checkIfApiKeyValid(authStringValue) == 0) {
+      if (!da.isApiKeyValid(authStringValue)) {
         throwException(Constants.authString, authStringValue);
       }
     } catch (SQLException e) {
@@ -56,12 +56,5 @@ public class AuthorizationInterceptor implements ServerInterceptor {
         .get(Key.of(Constants.authString, Metadata.ASCII_STRING_MARSHALLER));
   }
 
-  private Integer checkIfApiKeyValid(String authStringValue) throws SQLException {
-    if (authStringValue == null) {
-      return 0;
-    }
-    DSLContext context = DSL.using(hikariDataSource.getConnection(), SQLDialect.POSTGRES);
-    return context.selectCount().from(Organizations.ORGANIZATIONS)
-        .where(Organizations.ORGANIZATIONS.API_KEY.eq(authStringValue)).fetchOneInto(Integer.class);
-  }
+
 }

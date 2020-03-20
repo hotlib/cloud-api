@@ -32,7 +32,7 @@ public class DataReceiverClient {
     }
 
     public void sendData() {
-        DataRequest request = DataRequest.newBuilder().setDeviceData("{\"testtest\":\"11112\"}").setDeviceName("testname2").build();
+        DataRequest request = DataRequest.newBuilder().setDeviceData("{\"testtestp\":\"11112\"}").setDeviceName("testname").build();
         try {
             blockingStub.sendData(request);
         } catch (StatusRuntimeException e) {
