@@ -71,11 +71,11 @@ public class DataReceiverServer {
             try  {
                 DSLContext context = DSL.using(hikariDataSource.getConnection(), SQLDialect.POSTGRES);
                 DevicedataRecord record = new DevicedataRecord();
-                record.setDevicename(JSONB.valueOf(req.getDeviceName()));
+                record.setDevicename(req.getDeviceName());
                 record.setDevicedata(JSONB.valueOf(req.getDeviceData()));
                 context.executeInsert(record);
             } catch (Exception e) {
-                logger.error("Unable to insert data to postgres", e.getMessage());
+                logger.error("Unable to insert data to postgres", e);
             }
             responseObserver.onCompleted();
         }
