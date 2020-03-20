@@ -4,14 +4,16 @@ import com.google.protobuf.Empty;
 import com.zaxxer.hikari.HikariDataSource;
 import io.frinx.datareceiver.DataRequest;
 import io.frinx.datareceiver.DataReceiverGrpc;
+import io.frinx.db.tables.Devicedata;
 import io.frinx.db.tables.records.DevicedataRecord;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
-import java.util.logging.Logger;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
+import org.jooq.Record1;
+import org.jooq.Result;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.slf4j.LoggerFactory;
@@ -70,10 +72,21 @@ public class DataReceiverServer {
             responseObserver.onNext(Empty.getDefaultInstance());
             try  {
                 DSLContext context = DSL.using(hikariDataSource.getConnection(), SQLDialect.POSTGRES);
+                Result<Record1<Integer>> fetch = context.select(Devicedata.DEVICEDATA.ID)
+                    .from(Devicedata.DEVICEDATA)
+                    .where(Devicedata.DEVICEDATA.DEVICENAME.eq(req.getDeviceName())).fetch();
+
                 DevicedataRecord record = new DevicedataRecord();
                 record.setDevicename(req.getDeviceName());
                 record.setDevicedata(JSONB.valueOf(req.getDeviceData()));
-                context.executeInsert(record);
+
+                if(fetch.isEmpty()) { //new entry
+                    context.executeInsert(record);
+                } else { //update entry
+                    record.setId(fetch.get(0).value1());
+                    context.executeUpdate(record);
+                }
+
             } catch (Exception e) {
                 logger.error("Unable to insert data to postgres", e);
             }
