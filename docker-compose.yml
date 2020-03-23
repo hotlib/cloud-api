@@ -10,7 +10,7 @@ services:
       - cloudapi
     command: bash -c "mkdir -p /run/sshd && /usr/sbin/sshd && cd ../build && sed -i 's/127.0.0.1:50052/cloudapi:50052/g' config-sample/dev_conf.yaml && bash -c '(sleep 4 && ./devmand --logtostderr=1 --device_configuration_file=config-sample/dev_conf.yaml & cd js_plugins && nodemon plugin-linux-ifc-reader.js)'"
     volumes:
-      - /home/palo/cache_devmand_build:/cache/devmand/build
+      - ${HOME}/cache_devmand_build:/cache/devmand/build
 networks:
   default:
     external:
